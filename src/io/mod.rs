@@ -4,7 +4,7 @@ use std::{
     error::Error,
 };
 
-use crate::traits::{EditorIO, IOStatus};
+use crate::traits::EditorIO;
 
 pub struct FileIO {
     path: Option<String>
@@ -29,10 +29,7 @@ impl EditorIO for FileIO {
         }
         Ok(())
     }
-    fn status(&self) -> IOStatus {
-        match &self.path {
-            Some(p) => IOStatus::Attached(p.to_string()),
-            None => IOStatus::Blank
-        }
+    fn get_path(&self) -> Option<&String> {
+        self.path.as_ref()
     }
 }

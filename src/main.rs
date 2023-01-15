@@ -7,6 +7,7 @@ mod globals;
 mod editor;
 mod input_handler;
 mod io;
+mod syntax;
 mod terminal;
 mod traits;
 
@@ -16,6 +17,10 @@ fn main() {
 
     let editor_io = io::FileIO::new(path.cloned());
     let mut editor = editor::Editor::new(Box::new(editor_io));
+
+    let highlighter = syntax::SyntectHighlighter::new();
+    editor.set_highlighter(Box::new(highlighter));
+    editor.set_syntax();
     
     let mut target = stdout();
     let mut terminal_screen = terminal::TerminalScreen::new(&mut target);

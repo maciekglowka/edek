@@ -4,6 +4,7 @@ use crossterm::event::{
     KeyCode,
     KeyEvent,
     KeyEventKind,
+    KeyModifiers
 };
 use crate::editor::{
     commands,
@@ -26,6 +27,8 @@ fn handle_key_event(
     event: KeyEvent
 ) {
     match event {
+        KeyEvent {code: KeyCode::Char('s'), kind: KeyEventKind::Press, modifiers: KeyModifiers::CONTROL, ..} =>
+            commands::execute(commands::SaveFileCmd, editor),
         KeyEvent {code: KeyCode::Char(c), kind: KeyEventKind::Press, ..} => 
             commands::execute(commands::WriteCharCmd::new(c), editor),
         KeyEvent {code: KeyCode::Enter, kind: KeyEventKind::Press, ..} => 

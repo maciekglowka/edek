@@ -80,3 +80,12 @@ impl Command for NewLineCmd {
         editor.window.text = self.state.clone();
     }
 }
+
+
+pub struct SaveFileCmd;
+impl Command for SaveFileCmd {
+    fn execute(&mut self, editor: &mut Editor) -> bool {
+        editor.io.save(&editor.window.text.to_str());
+        false
+    }
+}

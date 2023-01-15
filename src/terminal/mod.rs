@@ -36,7 +36,7 @@ impl<'a, W: Write> TerminalScreen<'a, W> {
 impl<W: Write> Drop for TerminalScreen<'_, W> {
     fn drop(&mut self) {
         disable_raw_mode().expect("Could not leave the raw mode!");
-        self.target.execute(LeaveAlternateScreen).expect("Could not leave the alternate screent!");
+        self.target.execute(LeaveAlternateScreen).expect("Could not leave the alternate screen!");
     }
 }
 

@@ -5,15 +5,22 @@ pub struct Text {
 
 impl Text {
     pub fn new() -> Text {
-        Text { lines: Vec::new() }
+        Text { lines: vec!(String::new()) }
     }
     pub fn from_str(s: &str) -> Text {
         let lines: Vec<_> = s.split('\n').map(|l| l.to_string()).collect();
         Text { lines }
     }
+    pub fn to_str(&self) -> String {
+        self.lines.join("\n")
+    }
     pub fn insert_char(&mut self, c: char, row: usize, col: usize) {
         if let Some(line) = self.lines.get_mut(row) {
-            line.insert(col, c);
+            if let Some(i) = line.char_indices().nth(col) {
+                line.insert(i.0, c);
+            } else {
+                line.push(c);
+            }
         }
     }
     // TODO add proper errors
