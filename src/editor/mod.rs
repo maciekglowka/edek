@@ -40,7 +40,7 @@ impl Editor {
         self.highlighter = Some(highlighter);
     }
     pub fn set_syntax(&mut self) {
-        self.highlighter.as_mut().unwrap().set_syntax("rs");
+        self.highlighter.as_mut().unwrap().set_syntax_from_ext("rs");
     }
     pub fn resize(&mut self, w: usize, h: usize) {
         self.layout.resize(w, h);

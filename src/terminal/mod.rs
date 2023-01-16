@@ -3,7 +3,7 @@ use crossterm::{
     event::{read, Event},
     ExecutableCommand,
     QueueableCommand,
-    style,
+    style::{Color, PrintStyledContent, StyledContent, Stylize},
     terminal::{
         Clear,
         ClearType,
@@ -16,7 +16,7 @@ use crossterm::{
 };
 use std::io::Write;
 
-use crate::traits::{Screen, ScreenRenderer};
+use crate::traits::{Screen, ScreenRenderer, Span};
 
 pub struct TerminalScreen<'a, W: Write> {
     target: &'a mut W
@@ -45,7 +45,9 @@ impl<W: Write> ScreenRenderer for TerminalScreen<'_, W> {
         self.target.queue(cursor::MoveTo(0, 0));
         for line in screen.content.iter() {
             self.target.queue(Clear(ClearType::CurrentLine));
-            self.target.queue(style::Print(line));
+            for span in line {
+                self.target.queue(PrintStyledContent(span_to_styled(span)));
+            }
             self.target.queue(cursor::MoveToNextLine(1));
         }
         self.target.queue(cursor::MoveTo((screen.cursor_x) as u16, (screen.cursor_y) as u16));
@@ -63,4 +65,8 @@ pub fn wait_for_event() -> Option<Event> {
         Ok(e) => Some(e),
         _ => None
     }
+}
+
+fn span_to_styled<'a>(s: &Span<'a>) -> StyledContent<&'a str> {
+    s.text.with(Color::Rgb { r: s.col.0, g: s.col.1, b: s.col.2 })
 }

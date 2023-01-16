@@ -6,23 +6,24 @@ pub trait EditorIO {
     fn get_path(&self) -> Option<&String>;
 }
 
-// #[derive(Debug)]
-// pub enum IOStatus {
-//     Blank,
-//     Attached(String)
-// }
-
 pub trait ScreenRenderer {
     fn render(&mut self, screen: Screen);
 }
 
-pub struct Screen {
-    pub content: Vec<String>,
-    pub cursor_x: usize,
-    pub cursor_y: usize
+pub trait SyntaxHighlighter {
+    fn highlight_lines<'a>(&'a self, lines: &Vec<&'a str>) -> Option<StyledText>;
+    fn set_syntax_from_ext(&mut self, ext: &str);
 }
 
-pub trait SyntaxHighlighter {
-    fn highlight_line(&self, s: &str) -> String;
-    fn set_syntax(&mut self, ext: &str);
+pub type StyledText<'a> = Vec<Vec<Span<'a>>>;
+
+pub struct Span<'a> {
+    pub text: &'a str,
+    pub col: (u8, u8, u8)
+}
+
+pub struct Screen<'a> {
+    pub content: StyledText<'a>,
+    pub cursor_x: usize,
+    pub cursor_y: usize
 }

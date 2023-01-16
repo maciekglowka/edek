@@ -55,14 +55,15 @@ impl EditorWindow {
     pub fn get_row_bounds(&self) -> (usize, usize) {
         (self.scroll_y, cmp::min(self.scroll_y + self.h, self.text.lines.len()))
     }
-    pub fn visible_lines(&self) -> Vec<(usize, &String)> {
+    pub fn visible_lines(&self) -> Vec<&str> {
         let (min_row, max_row) = self.get_row_bounds();
-        self.text.lines[min_row..max_row].iter()
-            .enumerate()
-            .map(|(i, line)| {
-                (min_row + i, line)
-            })
-            .collect()
+        // self.text.lines[min_row..max_row].iter()
+        //     .enumerate()
+        //     .map(|(i, line)| {
+        //         (min_row + i, line)
+        //     })
+        //     .collect()
+        self.text.lines[min_row..max_row].iter().map(|a| a.as_str()).collect()
     }
     pub fn insert_char(&mut self, c: char) {
         self.text.insert_char(c, self.cursor.y, self.cursor.x);

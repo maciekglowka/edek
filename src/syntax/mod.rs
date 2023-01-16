@@ -1,12 +1,10 @@
 use syntect::{
     easy::HighlightLines,
     parsing::{SyntaxReference, SyntaxSet},
-    highlighting::{Theme, ThemeSet},
-    util::{LinesWithEndings, as_24_bit_terminal_escaped}
+    highlighting::{Style, ThemeSet}
 };
-use std::cell::RefCell;
 
-use crate::traits::SyntaxHighlighter;
+use crate::traits::{Span, StyledText, SyntaxHighlighter};
 
 pub struct SyntectHighlighter {
     ps: SyntaxSet,
@@ -23,18 +21,25 @@ impl SyntectHighlighter {
 }
 
 impl SyntaxHighlighter for SyntectHighlighter {
-    fn highlight_line(&self, s: &str) -> String {
-        match &self.syntax {
-            Some(syntax) => {
-                let mut h = HighlightLines::new(syntax, &self.ts.themes["base16-ocean.dark"]);
-                let ranges = h.highlight_line(s, &self.ps).unwrap();
-                as_24_bit_terminal_escaped(&ranges[..], false)
-            },
-            None => s.to_string()
-        }
-        
+    fn highlight_lines<'a>(&'a self, lines: &Vec<&'a str>) -> Option<StyledText> {
+        let syntax = self.syntax.as_ref()?;
+        let mut h = HighlightLines::new(&syntax, &self.ts.themes["base16-ocean.dark"]);
+
+        let styled = lines.iter()
+            .map(|line| {
+                h.highlight_line(line, &self.ps).unwrap()
+                    .iter()
+                    .map(|a| Span { text: a.1, col: style_to_col(a.0)})
+                    .collect::<Vec<_>>()
+            })
+            .collect();
+        Some(styled)
     }
-    fn set_syntax(&mut self, ext: &str) {
+    fn set_syntax_from_ext(&mut self, ext: &str) {
         self.syntax = Some(self.ps.find_syntax_by_extension(ext).unwrap().clone());
     }
+}
+
+fn style_to_col(style: Style) -> (u8, u8, u8) {
+    (style.foreground.r, style.foreground.g, style.foreground.b)
 }
