@@ -33,6 +33,7 @@ impl EditorWindow {
     pub fn move_cursor(&mut self, dir: CursorMove) {
         match dir {
             CursorMove::Down(v) => self.cursor.y += v,
+            CursorMove::End => self.cursor.target_x = self.text.lines[self.cursor.y].len(),
             CursorMove::Home => self.cursor.target_x = 0,
             CursorMove::Left(v) => self.cursor.target_x = self.cursor.x.saturating_sub(v),
             CursorMove::Right(v) => self.cursor.target_x = cmp::min(
@@ -57,12 +58,6 @@ impl EditorWindow {
     }
     pub fn visible_lines(&self) -> Vec<&str> {
         let (min_row, max_row) = self.get_row_bounds();
-        // self.text.lines[min_row..max_row].iter()
-        //     .enumerate()
-        //     .map(|(i, line)| {
-        //         (min_row + i, line)
-        //     })
-        //     .collect()
         self.text.lines[min_row..max_row].iter().map(|a| a.as_str()).collect()
     }
     pub fn insert_char(&mut self, c: char) {
@@ -74,5 +69,18 @@ impl EditorWindow {
             self.move_cursor(CursorMove::Down(1));
             self.move_cursor(CursorMove::Home);
         };
+    }
+    pub fn remove_char(&mut self) {
+        match self.cursor.x.saturating_sub(1) {
+            0 => {
+                self.move_cursor(CursorMove::Up(1));
+                self.move_cursor(CursorMove::End);
+                self.text.merge_lines(self.cursor.y + 1);
+            },
+            _ => {
+                self.text.remove_char(self.cursor.y, self.cursor.x.saturating_sub(1));
+                self.move_cursor(CursorMove::Left(1));
+            }
+        }
     }
 }

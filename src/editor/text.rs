@@ -31,4 +31,23 @@ impl Text {
         self.lines.insert(row + 1, rhs.into());
         Ok(())
     }
+    pub fn remove_char(&mut self, row: usize, col: usize) {
+        if let Some(line) = self.lines.get_mut(row) {
+            if let Some(i) = line.char_indices().nth(col) {
+                line.remove(i.0);
+            }
+        }
+    }
+    pub fn merge_lines(&mut self, row: usize) {
+        // merge current line with a previous one
+        if row == 0 { return; }
+        let current = match self.lines.get(row) {
+            None => return,
+            Some(c) => c.clone()
+        };
+        // the prev should exist since we are not at row 0
+        let previous = self.lines.get_mut(row-1).unwrap();
+        previous.push_str(&current);
+        self.lines.remove(row);
+    }
 }

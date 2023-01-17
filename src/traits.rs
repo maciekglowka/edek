@@ -1,4 +1,7 @@
-use std::error::Error;
+use std::{
+    borrow::Cow,
+    error::Error
+};
 
 pub trait EditorIO {
     fn load(&mut self) -> Result<String, Box<dyn Error>>;
@@ -11,19 +14,25 @@ pub trait ScreenRenderer {
 }
 
 pub trait SyntaxHighlighter {
-    fn highlight_lines<'a>(&'a self, lines: &Vec<&'a str>) -> Option<StyledText>;
+    fn highlight_lines<'a>(&'a self, lines: &Vec<&'a str>) -> Option<StyledText<&'a str>>;
     fn set_syntax_from_ext(&mut self, ext: &str);
 }
 
-pub type StyledText<'a> = Vec<Vec<Span<'a>>>;
+pub type StyledText<D> = Vec<Vec<Span<D>>>;
 
-pub struct Span<'a> {
-    pub text: &'a str,
+pub struct Span<D: std::fmt::Display + Default> {
+    pub text: D,
     pub col: (u8, u8, u8)
 }
 
+impl<D: std::fmt::Display + Default> Default for Span<D> {
+    fn default() -> Self {
+        Span { col: (255, 255, 255), text: Default::default() }
+    }
+}
+
 pub struct Screen<'a> {
-    pub content: StyledText<'a>,
+    pub content: StyledText<Cow<'a, str>>,
     pub cursor_x: usize,
     pub cursor_y: usize
 }

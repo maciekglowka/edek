@@ -21,7 +21,7 @@ impl SyntectHighlighter {
 }
 
 impl SyntaxHighlighter for SyntectHighlighter {
-    fn highlight_lines<'a>(&'a self, lines: &Vec<&'a str>) -> Option<StyledText> {
+    fn highlight_lines<'a>(&'a self, lines: &Vec<&'a str>) -> Option<StyledText<&'a str>> {
         let syntax = self.syntax.as_ref()?;
         let mut h = HighlightLines::new(&syntax, &self.ts.themes["base16-ocean.dark"]);
 

@@ -14,7 +14,10 @@ use crossterm::{
         size,
     }
 };
-use std::io::Write;
+use std::{
+    borrow::Cow,
+    io::Write
+};
 
 use crate::traits::{Screen, ScreenRenderer, Span};
 
@@ -42,15 +45,16 @@ impl<W: Write> Drop for TerminalScreen<'_, W> {
 
 impl<W: Write> ScreenRenderer for TerminalScreen<'_, W> {
     fn render(&mut self, screen: Screen) {
+        self.target.queue(cursor::Hide);
         self.target.queue(cursor::MoveTo(0, 0));
         for line in screen.content.iter() {
-            self.target.queue(Clear(ClearType::CurrentLine));
             for span in line {
                 self.target.queue(PrintStyledContent(span_to_styled(span)));
             }
             self.target.queue(cursor::MoveToNextLine(1));
         }
         self.target.queue(cursor::MoveTo((screen.cursor_x) as u16, (screen.cursor_y) as u16));
+        self.target.queue(cursor::Show);
         self.target.flush();
     }
 }
@@ -67,6 +71,6 @@ pub fn wait_for_event() -> Option<Event> {
     }
 }
 
-fn span_to_styled<'a>(s: &Span<'a>) -> StyledContent<&'a str> {
+fn span_to_styled<'a>(s: &'a Span<Cow<'a, str>>) -> StyledContent<&'a str> {
     s.text.with(Color::Rgb { r: s.col.0, g: s.col.1, b: s.col.2 })
 }

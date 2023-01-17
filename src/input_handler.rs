@@ -33,6 +33,8 @@ fn handle_key_event(
             commands::execute(commands::WriteCharCmd::new(c), editor),
         KeyEvent {code: KeyCode::Enter, kind: KeyEventKind::Press, ..} => 
             commands::execute(commands::NewLineCmd::new(), editor),
+        KeyEvent {code: KeyCode::Backspace, kind: KeyEventKind::Press, ..} => 
+            commands::execute(commands::RemoveCharCmd::new(), editor),
         KeyEvent {code: KeyCode::Left, kind: KeyEventKind::Press, ..} => 
             commands::execute(commands::MoveCursorCmd::new(CursorMove::Left(1)), editor),
         KeyEvent {code: KeyCode::Right, kind: KeyEventKind::Press, ..} => 

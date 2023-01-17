@@ -38,6 +38,27 @@ impl Command for WriteCharCmd {
     }
 }
 
+#[derive(Default)]
+pub struct RemoveCharCmd {
+    state: Text
+}
+impl RemoveCharCmd {
+    pub fn new() -> RemoveCharCmd {
+        RemoveCharCmd { ..Default::default() }
+    }
+}
+impl Command for RemoveCharCmd {
+    fn execute(&mut self, editor: &mut Editor) -> bool {
+        self.state = editor.window.text.clone();
+        editor.window.remove_char();
+        true
+    }
+    fn rollback(&mut self, editor: &mut Editor) {
+        editor.window.text = self.state.clone();
+    }
+}
+
+
 pub struct MoveCursorCmd {
     dir: CursorMove
 }
@@ -80,7 +101,6 @@ impl Command for NewLineCmd {
         editor.window.text = self.state.clone();
     }
 }
-
 
 pub struct SaveFileCmd;
 impl Command for SaveFileCmd {
